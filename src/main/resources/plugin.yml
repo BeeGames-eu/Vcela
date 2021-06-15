@@ -1,0 +1,5 @@
+name: Vcela
+version: ${version}
+description: Jadro vseho souvisejiciho s BeeGames.eu
+main: eu.beegames.core.bukkit.CorePlugin
+author: TTtie
