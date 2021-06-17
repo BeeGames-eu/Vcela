@@ -18,16 +18,14 @@ class LocalAlertCommand(plugin: CorePlugin) : BaseAlertCommand(plugin, "lalert",
             return
         }
 
-        val alert = args.joinToString(" ")
+        val alert = ChatColor.translateAlternateColorCodes('&', args.joinToString(" "))
 
-        val alertComponent = TextComponent(alert)
+        val alertComponent = TextComponent.fromLegacyText(alert)
 
         val title = getTitle(alertComponent)
 
-        val alertMessage = getMessage(alertComponent)
-
         for (player in sender.server.info.players) {
-            player.sendMessage(alertMessage)
+            player.sendMessage(ALERT_PREFIX.duplicate(), *alertComponent)
             player.sendTitle(title)
         }
     }

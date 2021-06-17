@@ -1,5 +1,5 @@
 name: Vcela
-version: 1.1.1
+version: 1.1.2
 description: Jadro vseho souvisejiciho s BeeGames.eu
 main: eu.beegames.core.bukkit.CorePlugin
 author: TTtie
