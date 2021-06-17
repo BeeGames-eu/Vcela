@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "eu.beegames"
-version = "1.0.0"
+version = "1.1.1"
 
 repositories {
     mavenCentral()
@@ -29,7 +29,8 @@ tasks {
         dependsOn("shadowJar")
     }
     processResources {
-        expand(Pair("version", project.version))
+        // unfortunately, doesn't work very well...
+        // expand(Pair("version", project.version))
     }
 }
 
