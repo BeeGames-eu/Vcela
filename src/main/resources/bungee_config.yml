@@ -1,0 +1,7 @@
+db:
+  max_pool_size: 10
+  host: mc.beegames.eu
+  port: 3306
+  name: s45_vcela
+  username: TODO
+  password: TODO123
