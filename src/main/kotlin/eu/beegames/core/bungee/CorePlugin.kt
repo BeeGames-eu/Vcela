@@ -1,10 +1,9 @@
 package eu.beegames.core.bungee
 
-import eu.beegames.core.bungee.commands.GlobalAlertCommand
-import eu.beegames.core.bungee.commands.LocalAlertCommand
-import eu.beegames.core.bungee.commands.TPCommand
+import eu.beegames.core.bungee.commands.*
 import eu.beegames.core.common.Constants
 import eu.beegames.core.common.db.DatabaseGetter
+import eu.beegames.core.common.db.models.DiscordLinkData
 import eu.beegames.core.common.db.models.PlayerStatistic
 import net.md_5.bungee.api.connection.ProxiedPlayer
 import net.md_5.bungee.api.event.PluginMessageEvent
@@ -15,9 +14,7 @@ import net.md_5.bungee.config.ConfigurationProvider
 import net.md_5.bungee.config.YamlConfiguration
 import net.md_5.bungee.event.EventHandler
 import org.ktorm.database.Database
-import org.ktorm.dsl.delete
-import org.ktorm.dsl.insert
-import org.ktorm.dsl.less
+import org.ktorm.dsl.*
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
@@ -29,16 +26,19 @@ import java.util.concurrent.TimeUnit
 class CorePlugin : Plugin(), Listener {
     private val quartersOfHour = arrayOf(0, 15, 30, 45)
 
-    private lateinit var db: Database
+    lateinit var db: Database
     private lateinit var config: Configuration
 
 
     override fun onEnable() {
-        proxy.pluginManager.registerCommand(this, TPCommand(this))
-        proxy.pluginManager.registerCommand(this, GlobalAlertCommand(this))
-        proxy.pluginManager.registerCommand(this, LocalAlertCommand(this))
+        val plm = proxy.pluginManager
 
-        proxy.pluginManager.registerListener(this, this)
+        plm.registerCommand(this, TPCommand(this))
+        plm.registerCommand(this, GlobalAlertCommand(this))
+        plm.registerCommand(this, LocalAlertCommand(this))
+        plm.registerCommand(this, DiscordLinkCommand(this))
+
+        plm.registerListener(this, this)
 
         if (!dataFolder.exists()) {
             dataFolder.mkdir()
@@ -80,9 +80,10 @@ class CorePlugin : Plugin(), Listener {
                     set(it.playerCount, proxy.players.size)
                 }
                 db.delete(PlayerStatistic) {
-                    // Zatim mazat zaznamy starsi nez den
-                    // TODO(TTtie): zmenit na 1 mesic
                     it.timestamp less ts.minusMonths(1L)
+                }
+                db.delete(DiscordLinkData) {
+                    (it.createdAt less ts.minusMinutes(15)) and (it.isLinked eq false)
                 }
             }
         }, 0, 1, TimeUnit.SECONDS)

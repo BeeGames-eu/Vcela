@@ -98,9 +98,9 @@ class TPCommand(private val plugin: CorePlugin) : Command("xtp", "eu.beegames.co
             return mutableSetOf()
         }
 
-        val search = args[0].toLowerCase()
+        val search = args[0].lowercase()
         return plugin.proxy.players.filter {
-            it.name.toLowerCase().startsWith(search)
+            it.name.lowercase().startsWith(search)
         }.map {
             it.name
         }.toMutableList()

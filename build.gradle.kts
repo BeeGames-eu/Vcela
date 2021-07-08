@@ -1,5 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -8,7 +9,7 @@ plugins {
 }
 
 group = "eu.beegames"
-version = "1.1.3"
+version = "1.2.0"
 
 repositories {
     mavenCentral()
@@ -37,7 +38,14 @@ val makeShadow = tasks.register<ShadowJar>("makeShadow") {
     from(sourceSets.main.orNull?.output)
     configurations = mutableListOf(project.configurations.shadow.get())
 
-    //dependsOn("relocateShadows")
+    dependsOn("relocateShadows")
+
+    doFirst {
+        relocators.removeIf {
+            // Relocating kotlin somehow breaks kotlin's reflection
+            (it is SimpleRelocator) && (it.pattern == "kotlin" || it.pattern.startsWith("kotlin."))
+        }
+    }
 }
 
 tasks {
@@ -47,10 +55,10 @@ tasks {
     }
 
     // To implementors: you must relocate kotlin references to eu.beegames.core.lib.kotlin etc.
-    /*register<ConfigureShadowRelocation>("relocateShadows") {
+    register<ConfigureShadowRelocation>("relocateShadows") {
         target = makeShadow.get()
         prefix = "eu.beegames.core.lib"
-    }*/
+    }
 
     processResources {
         // unfortunately, doesn't work very well...
