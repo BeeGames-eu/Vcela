@@ -61,17 +61,8 @@ tasks {
     }
 
     processResources {
-        // unfortunately, doesn't work very well...
-        // expand(Pair("version", project.version))
-    }
-}
-
-/*open class KotlinAlignment : ComponentMetadataRule {
-    override fun execute(ctx: ComponentMetadataContext) {
-        ctx.details.run {
-            if (id.group.startsWith("org.jetbrains.kotlin")) {
-                belongsTo("org.jetbrains.kotlin:kotlin-platform:1.5.10")
-            }
+        doFirst {
+            expand(Pair("version", version))
         }
     }
-}*/
+}
