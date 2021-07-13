@@ -10,4 +10,5 @@ object DiscordLinkData : Table<Nothing>("vcela_discord_link_data") {
     val sessionID = varchar("link_session_id")
     val createdAt = datetime("created_at")
     val isLinked = boolean("linked")
+    val hasVIPRole = boolean("has_vip_role")
 }
