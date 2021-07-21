@@ -12,6 +12,7 @@ import net.md_5.bungee.api.plugin.Command
 import net.md_5.bungee.api.plugin.TabExecutor
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
+import java.util.*
 
 class TPCommand(private val plugin: CorePlugin) : Command("xtp", "eu.beegames.core.tp"), TabExecutor {
     override fun execute(sender: CommandSender, args: Array<out String>) {
@@ -98,9 +99,9 @@ class TPCommand(private val plugin: CorePlugin) : Command("xtp", "eu.beegames.co
             return mutableSetOf()
         }
 
-        val search = args[0].toLowerCase()
+        val search = args[0].lowercase(Locale.getDefault())
         return plugin.proxy.players.filter {
-            it.name.toLowerCase().startsWith(search)
+            it.name.lowercase(Locale.getDefault()).startsWith(search)
         }.map {
             it.name
         }.toMutableList()
