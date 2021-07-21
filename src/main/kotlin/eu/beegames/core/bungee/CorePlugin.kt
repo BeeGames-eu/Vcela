@@ -108,6 +108,7 @@ class CorePlugin : Plugin(), Listener {
         }
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun handlePluginMessage(msg: ByteArray) {
         // No-op: might be handled soon.
     }
