@@ -2,12 +2,17 @@ package eu.beegames.core.bungee
 
 import eu.beegames.core.bungee.commands.GlobalAlertCommand
 import eu.beegames.core.bungee.commands.LocalAlertCommand
+import eu.beegames.core.bungee.commands.ReloadMOTDCommand
 import eu.beegames.core.bungee.commands.TPCommand
 import eu.beegames.core.common.Constants
 import eu.beegames.core.common.db.DatabaseGetter
 import eu.beegames.core.common.db.models.PlayerStatistic
+import net.md_5.bungee.api.ChatColor
+import net.md_5.bungee.api.ServerPing
+import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.api.connection.ProxiedPlayer
 import net.md_5.bungee.api.event.PluginMessageEvent
+import net.md_5.bungee.api.event.ProxyPingEvent
 import net.md_5.bungee.api.plugin.Listener
 import net.md_5.bungee.api.plugin.Plugin
 import net.md_5.bungee.config.Configuration
@@ -19,11 +24,12 @@ import org.ktorm.dsl.delete
 import org.ktorm.dsl.insert
 import org.ktorm.dsl.less
 import java.io.File
-import java.io.IOException
 import java.nio.file.Files
 import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.TimeUnit
+import java.util.stream.Collectors
+import kotlin.streams.asStream
 
 @Suppress("unused")
 class CorePlugin : Plugin(), Listener {
@@ -32,11 +38,21 @@ class CorePlugin : Plugin(), Listener {
     private lateinit var db: Database
     private lateinit var config: Configuration
 
+    private lateinit var precompiledPlayerList: Array<out ServerPing.PlayerInfo>
+    private lateinit var precompiledMotdText: TextComponent
+
+
 
     override fun onEnable() {
-        proxy.pluginManager.registerCommand(this, TPCommand(this))
-        proxy.pluginManager.registerCommand(this, GlobalAlertCommand(this))
-        proxy.pluginManager.registerCommand(this, LocalAlertCommand(this))
+        arrayOf(
+            ::TPCommand,
+            ::GlobalAlertCommand,
+            ::LocalAlertCommand,
+            ::ReloadMOTDCommand
+        ).forEach {
+            proxy.pluginManager.registerCommand(this, it(this))
+        }
+
 
         proxy.pluginManager.registerListener(this, this)
 
@@ -44,19 +60,10 @@ class CorePlugin : Plugin(), Listener {
             dataFolder.mkdir()
         }
 
-        val f = File(dataFolder, "config.yml")
+        val f = ensureFile(dataFolder, "config.yml", "bungee_config.yml")
+        config = ConfigurationProvider.getProvider(YamlConfiguration::class.java).load(f)
 
-        if (!f.exists()) {
-            try {
-                val ist = getResourceAsStream("bungee_config.yml")
-                Files.copy(ist, f.toPath())
-            } catch (ex: IOException) {
-                logger.severe("Couldn't copy default configuration:")
-                logger.severe(ex.stackTraceToString())
-            }
-        }
-
-        config = ConfigurationProvider.getProvider(YamlConfiguration::class.java).load(File(dataFolder, "config.yml"))
+        reloadMOTDFiles()
 
         db = DatabaseGetter.getInstance(
             config.getInt("db.max_pool_size", 10),
@@ -108,8 +115,55 @@ class CorePlugin : Plugin(), Listener {
         }
     }
 
+    @EventHandler
+    fun on(ev: ProxyPingEvent) {
+        ev.response.apply {
+            players.sample = precompiledPlayerList
+            descriptionComponent = precompiledMotdText
+        }
+    }
+
     @Suppress("UNUSED_PARAMETER")
     private fun handlePluginMessage(msg: ByteArray) {
         // No-op: might be handled soon.
+    }
+
+    fun reloadMOTDFiles() {
+        val motdFile = ensureFile(dataFolder, "motd.txt")
+        val playerListFile = ensureFile(dataFolder, "player_list.txt")
+
+        precompiledMotdText = TextComponent(*TextComponent.fromLegacyText(
+            ChatColor.translateAlternateColorCodes(
+                '&',
+                motdFile.readText()
+            )
+        ))
+
+        precompiledPlayerList = playerListFile.useLines {
+            it.take(64).map {
+                ServerPing.PlayerInfo(
+                    ChatColor.translateAlternateColorCodes('&', it),
+                    UUID.randomUUID()
+                )
+            }.toList().toTypedArray()
+        }
+    }
+
+    private fun ensureFile(path: File, child: String, sourceFileName: String = child): File {
+        val f = File(path, child)
+
+        if (!f.exists()) {
+            try {
+                getResourceAsStream(sourceFileName)
+                    .use {
+                        Files.copy(it, f.toPath())
+                    }
+            } catch (ex: Exception) {
+                logger.severe("Couldn't copy default configuration:")
+                logger.severe(ex.stackTraceToString())
+            }
+        }
+
+        return f
     }
 }

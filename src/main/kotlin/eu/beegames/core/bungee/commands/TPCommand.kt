@@ -66,15 +66,16 @@ class TPCommand(private val plugin: CorePlugin) : Command("xtp", "eu.beegames.co
 
         val serverToTpTo = playerToTpTo.server
 
-        val messageData = ByteArrayOutputStream().also {
-            val bos = DataOutputStream(it)
+        val messageData = ByteArrayOutputStream().use { baos ->
+            val bos = DataOutputStream(baos)
 
-            with(bos) {
-                writeUTF("TeleportToPlayer")
-                writeUTF(sender.uniqueId.toString())
-                writeUTF(playerToTpTo.uniqueId.toString())
+            bos.use {
+                it.writeUTF("TeleportToPlayer")
+                it.writeUTF(sender.uniqueId.toString())
+                it.writeUTF(playerToTpTo.uniqueId.toString())
             }
-        }.toByteArray()
+            baos.toByteArray()
+        }
 
         if (serverToTpTo.info == sender.server.info) {
             serverToTpTo.sendData(Constants.PluginMessagingChannel, messageData)
