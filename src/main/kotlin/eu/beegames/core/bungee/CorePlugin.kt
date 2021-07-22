@@ -3,7 +3,6 @@ package eu.beegames.core.bungee
 import eu.beegames.core.bungee.commands.GlobalAlertCommand
 import eu.beegames.core.bungee.commands.LocalAlertCommand
 import eu.beegames.core.bungee.commands.ReloadMOTDCommand
-import eu.beegames.core.bungee.commands.TPCommand
 import eu.beegames.core.common.Constants
 import eu.beegames.core.common.db.DatabaseGetter
 import eu.beegames.core.common.db.models.PlayerStatistic
@@ -28,8 +27,6 @@ import java.nio.file.Files
 import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.TimeUnit
-import java.util.stream.Collectors
-import kotlin.streams.asStream
 
 @Suppress("unused")
 class CorePlugin : Plugin(), Listener {
@@ -45,10 +42,9 @@ class CorePlugin : Plugin(), Listener {
 
     override fun onEnable() {
         arrayOf(
-            ::TPCommand,
             ::GlobalAlertCommand,
             ::LocalAlertCommand,
-            ::ReloadMOTDCommand
+            ::ReloadMOTDCommand,
         ).forEach {
             proxy.pluginManager.registerCommand(this, it(this))
         }

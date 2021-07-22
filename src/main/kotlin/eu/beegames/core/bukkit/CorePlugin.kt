@@ -16,86 +16,27 @@ import java.util.*
 
 @Suppress("unused")
 class CorePlugin : JavaPlugin(), PluginMessageListener, Listener {
-    private val pendingTeleports = HashMap<String, String>()
 
     override fun onEnable() {
-        server.messenger.registerIncomingPluginChannel(this, Constants.PluginMessagingChannel, this)
-        server.messenger.registerOutgoingPluginChannel(this, Constants.PluginMessagingChannel)
+        // No messages need to be handled right now
+        // server.messenger.registerIncomingPluginChannel(this, Constants.PluginMessagingChannel, this)
+        // server.messenger.registerOutgoingPluginChannel(this, Constants.PluginMessagingChannel)
 
-        server.pluginManager.registerEvents(this, this)
+        // No listeners need to be handled right now
+        // server.pluginManager.registerEvents(this, this)
 
         logger.info("Vcela was loaded")
     }
 
-    @EventHandler
-    fun on(ev: PlayerJoinEvent) {
-        val id = synchronized(pendingTeleports) {
-            pendingTeleports[ev.player.uniqueId.toString()]
-        }
-        if (id != null) {
-            logger.info("${ev.player.name} should be teleported to player with ID ${id}")
-            val toPlayer = server.getPlayer(UUID.fromString(id))
-            if (toPlayer?.isOnline == true) {
-                ev.player.teleport(toPlayer, PlayerTeleportEvent.TeleportCause.PLUGIN)
-                ev.player.spigot().sendMessage(Constants.PREFIX.duplicate().apply {
-                    addExtra(TextComponent("Byl jsi teleportovan k hraci ").apply {
-                        color = ChatColor.GREEN
-                        addExtra(TextComponent(toPlayer.name).apply {
-                            color = ChatColor.YELLOW
-                        })
-                        addExtra(TextComponent(".").apply {
-                            color = ChatColor.GREEN
-                        })
-                    })
-                })
-            } else {
-                ev.player.spigot().sendMessage(Constants.PREFIX.duplicate().apply {
-                    addExtra(TextComponent("Teleportace selhala, hrac stihl opustit server drive, nez jsi byl teleportovan.").apply {
-                        color = ChatColor.RED
-                    })
-                })
-            }
-
-            synchronized(pendingTeleports) {
-                pendingTeleports.remove(id)
-            }
-        }
-    }
-
     override fun onPluginMessageReceived(channel: String, player: Player, message: ByteArray) {
-        if (channel != Constants.PluginMessagingChannel) return
+        // No messages need to be handled right now
+        return
 
-        val bis = DataInputStream(ByteArrayInputStream(message))
-
-        when(bis.readUTF()) {
-            "TeleportToPlayer" -> {
-                val from = UUID.fromString(bis.readUTF())
-                val to = UUID.fromString(bis.readUTF())
-
-                val fromPlayer: Player? = server.getPlayer(from)
-                val toPlayer: Player? = server.getPlayer(to)
-
-                if (fromPlayer?.isOnline == true) {
-                    if (toPlayer?.isOnline == true) {
-                        fromPlayer.teleport(toPlayer.location, PlayerTeleportEvent.TeleportCause.PLUGIN)
-                        fromPlayer.spigot().sendMessage(Constants.PREFIX.duplicate().apply {
-                            addExtra(TextComponent("Byl jsi teleportovan k hraci ").apply {
-                                color = ChatColor.GREEN
-                                addExtra(TextComponent(toPlayer.name).apply {
-                                    color = ChatColor.YELLOW
-                                })
-                                addExtra(TextComponent(".").apply {
-                                    color = ChatColor.GREEN
-                                })
-                            })
-                        })
-                    }
-                } else {
-                    synchronized(pendingTeleports) {
-                        pendingTeleports[from.toString()] = to.toString()
-                    }
-                }
+        /*if (channel != Constants.PluginMessagingChannel) return
+        ByteArrayInputStream(message).use {
+            DataInputStream(it).use {
+                // handle any incoming messages as needed
             }
-        }
+        }*/
     }
 }
