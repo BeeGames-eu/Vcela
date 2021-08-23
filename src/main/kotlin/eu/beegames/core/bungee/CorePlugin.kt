@@ -3,12 +3,17 @@ package eu.beegames.core.bungee
 import eu.beegames.core.bungee.commands.GlobalAlertCommand
 import eu.beegames.core.bungee.commands.LocalAlertCommand
 import eu.beegames.core.bungee.commands.ReloadMOTDCommand
+import eu.beegames.core.bungee.commands.ServerSpecificAlertCommand
 import eu.beegames.core.common.Constants
 import eu.beegames.core.common.db.DatabaseGetter
 import eu.beegames.core.common.db.models.PlayerStatistic
+import net.kyori.adventure.platform.bungeecord.BungeeAudiences
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.ServerPing
-import net.md_5.bungee.api.chat.TextComponent
+import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.connection.ProxiedPlayer
 import net.md_5.bungee.api.event.PluginMessageEvent
 import net.md_5.bungee.api.event.ProxyPingEvent
@@ -18,6 +23,7 @@ import net.md_5.bungee.config.Configuration
 import net.md_5.bungee.config.ConfigurationProvider
 import net.md_5.bungee.config.YamlConfiguration
 import net.md_5.bungee.event.EventHandler
+import net.md_5.bungee.protocol.ProtocolConstants
 import org.ktorm.database.Database
 import org.ktorm.dsl.delete
 import org.ktorm.dsl.insert
@@ -35,15 +41,23 @@ class CorePlugin : Plugin(), Listener {
     private lateinit var db: Database
     private lateinit var config: Configuration
 
+    private var _adv: BungeeAudiences? = null
+    val adventure: BungeeAudiences
+        get() {
+            return _adv ?: throw IllegalStateException("Audience is not available")
+        }
+
     private lateinit var precompiledPlayerList: Array<out ServerPing.PlayerInfo>
-    private lateinit var precompiledMotdText: TextComponent
-
-
+    private lateinit var precompiledMotdText: BaseComponent
+    private lateinit var precompiledMotdTextPre116: BaseComponent
 
     override fun onEnable() {
+        _adv = BungeeAudiences.create(this)
+
         arrayOf(
             ::GlobalAlertCommand,
             ::LocalAlertCommand,
+            ::ServerSpecificAlertCommand,
             ::ReloadMOTDCommand,
         ).forEach {
             proxy.pluginManager.registerCommand(this, it(this))
@@ -83,14 +97,16 @@ class CorePlugin : Plugin(), Listener {
                     set(it.playerCount, proxy.players.size)
                 }
                 db.delete(PlayerStatistic) {
-                    // Zatim mazat zaznamy starsi nez den
-                    // TODO(TTtie): zmenit na 1 mesic
                     it.timestamp less ts.minusMonths(1L)
                 }
             }
         }, 0, 1, TimeUnit.SECONDS)
 
         logger.info("Vcela was loaded.")
+    }
+
+    override fun onDisable() {
+        this._adv?.close()
     }
 
     @EventHandler
@@ -115,7 +131,8 @@ class CorePlugin : Plugin(), Listener {
     fun on(ev: ProxyPingEvent) {
         ev.response.apply {
             players.sample = precompiledPlayerList
-            descriptionComponent = precompiledMotdText
+            descriptionComponent = if (ev.connection.version >= ProtocolConstants.MINECRAFT_1_16) precompiledMotdText
+                else precompiledMotdTextPre116
         }
     }
 
@@ -128,17 +145,17 @@ class CorePlugin : Plugin(), Listener {
         val motdFile = ensureFile(dataFolder, "motd.txt")
         val playerListFile = ensureFile(dataFolder, "player_list.txt")
 
-        precompiledMotdText = TextComponent(*TextComponent.fromLegacyText(
-            ChatColor.translateAlternateColorCodes(
-                '&',
-                motdFile.readText()
-            )
-        ))
+        val motdText = Component.text()
+            .append(LegacyComponentSerializer.legacyAmpersand().deserialize(motdFile.readText()))
+            .build()
 
-        precompiledPlayerList = playerListFile.useLines {
-            it.take(64).map {
+        precompiledMotdText = BungeeComponentSerializer.get().serialize(motdText)[0]
+        precompiledMotdTextPre116 = BungeeComponentSerializer.legacy().serialize(motdText)[0]
+
+        playerListFile.useLines {
+            precompiledPlayerList = it.take(64).map { str ->
                 ServerPing.PlayerInfo(
-                    ChatColor.translateAlternateColorCodes('&', it),
+                    ChatColor.translateAlternateColorCodes('&', str),
                     UUID.randomUUID()
                 )
             }.toList().toTypedArray()

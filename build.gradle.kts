@@ -25,12 +25,16 @@ repositories {
 dependencies {
     //components.all(KotlinAlignment::class.java)
     compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
-    compileOnly("net.md-5:bungeecord-api:1.16-R0.5-SNAPSHOT")
+    compileOnly("net.md-5:bungeecord-api:1.17-R0.1-SNAPSHOT")
 
     shadow(kotlin("stdlib-jdk8"))
     shadow(kotlin("reflect"))
     shadow("com.zaxxer:HikariCP:4.0.3")
     shadow("org.ktorm:ktorm-core:3.4.1")
+
+    shadow("net.kyori:adventure-api:4.8.1")
+    shadow("net.kyori:adventure-platform-bungeecord:4.0.0-SNAPSHOT")
+    // shadow("net.kyori:adventure-platform-bukkit:4.0.0-SNAPSHOT")
 }
 
 val makeShadow = tasks.register<ShadowJar>("makeShadow") {
@@ -62,7 +66,7 @@ tasks {
 
     processResources {
         doFirst {
-            expand(Pair("version", version))
+            expand("version" to version)
         }
     }
 }

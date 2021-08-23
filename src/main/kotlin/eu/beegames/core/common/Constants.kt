@@ -1,22 +1,17 @@
 package eu.beegames.core.common
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TextComponent
 
 class Constants {
     companion object {
-        val PREFIX = TextComponent("[").apply {
-            color = ChatColor.DARK_GRAY
-            addExtra(TextComponent("Vcela").apply {
-                color = ChatColor.GOLD
-            })
-            addExtra(TextComponent("]").apply {
-                color = ChatColor.DARK_GRAY
-            })
-            addExtra(TextComponent(" ").apply {
-                color = ChatColor.RESET
-            })
-        }
+        val ADVENTURE_PREFIX = Component.text("[", NamedTextColor.DARK_GRAY)
+            .append(Component.text("Vcela", NamedTextColor.GOLD))
+            .append(Component.text("]", NamedTextColor.DARK_GRAY))
+            .append(Component.text(" ", NamedTextColor.WHITE))
+
         const val PluginMessagingChannel = "beegames_core:pmc"
     }
 }
