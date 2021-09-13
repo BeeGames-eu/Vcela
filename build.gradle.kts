@@ -26,11 +26,13 @@ dependencies {
     //components.all(KotlinAlignment::class.java)
     compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
     compileOnly("net.md-5:bungeecord-api:1.17-R0.1-SNAPSHOT")
+    compileOnly("net.luckperms:api:5.3")
 
     shadow(kotlin("stdlib-jdk8"))
     shadow(kotlin("reflect"))
     shadow("com.zaxxer:HikariCP:4.0.3")
     shadow("org.ktorm:ktorm-core:3.4.1")
+    shadow("com.maxmind.geoip2:geoip2:2.15.0")
 
     shadow("net.kyori:adventure-api:4.8.1")
     shadow("net.kyori:adventure-platform-bungeecord:4.0.0-SNAPSHOT")

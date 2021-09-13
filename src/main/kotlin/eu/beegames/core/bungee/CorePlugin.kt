@@ -4,6 +4,7 @@ import eu.beegames.core.bungee.commands.GlobalAlertCommand
 import eu.beegames.core.bungee.commands.LocalAlertCommand
 import eu.beegames.core.bungee.commands.ReloadMOTDCommand
 import eu.beegames.core.bungee.commands.ServerSpecificAlertCommand
+import eu.beegames.core.bungee.listener.CoreListener
 import eu.beegames.core.common.Constants
 import eu.beegames.core.common.db.DatabaseGetter
 import eu.beegames.core.common.db.models.PlayerStatistic
@@ -51,6 +52,8 @@ class CorePlugin : Plugin(), Listener {
     private lateinit var precompiledMotdText: BaseComponent
     private lateinit var precompiledMotdTextPre116: BaseComponent
 
+    internal lateinit var whitelistedCountries: List<String>
+
     override fun onEnable() {
         _adv = BungeeAudiences.create(this)
 
@@ -65,6 +68,7 @@ class CorePlugin : Plugin(), Listener {
 
 
         proxy.pluginManager.registerListener(this, this)
+        proxy.pluginManager.registerListener(this, CoreListener(this))
 
         if (!dataFolder.exists()) {
             dataFolder.mkdir()
@@ -72,6 +76,8 @@ class CorePlugin : Plugin(), Listener {
 
         val f = ensureFile(dataFolder, "config.yml", "bungee_config.yml")
         config = ConfigurationProvider.getProvider(YamlConfiguration::class.java).load(f)
+
+        whitelistedCountries = config.getStringList("allowed_countries")
 
         reloadMOTDFiles()
 

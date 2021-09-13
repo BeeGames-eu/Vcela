@@ -11,7 +11,7 @@ import net.md_5.bungee.api.CommandSender
 import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.api.connection.ProxiedPlayer
 
-class LocalAlertCommand(plugin: CorePlugin) : BaseAlertCommand(plugin, "lalert", "eu.beegames.core.send_alert") {
+class LocalAlertCommand(plugin: CorePlugin) : BaseAlertCommand(plugin, "lalert", Constants.Permissions.SendAlert) {
     override fun execute(sender: CommandSender, args: Array<out String>) {
         if (sender !is ProxiedPlayer) {
             plugin.adventure.sender(sender).sendMessage(

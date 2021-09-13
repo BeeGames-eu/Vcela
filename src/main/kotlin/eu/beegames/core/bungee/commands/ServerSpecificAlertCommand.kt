@@ -7,7 +7,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.md_5.bungee.api.CommandSender
 
-class ServerSpecificAlertCommand(plugin: CorePlugin) : BaseAlertCommand(plugin, "salert", "eu.beegames.core.send_alert") {
+class ServerSpecificAlertCommand(plugin: CorePlugin) : BaseAlertCommand(plugin, "salert", Constants.Permissions.SendAlert) {
     override fun execute(sender: CommandSender, args: Array<out String>) {
         if (args.size < 2) {
             plugin.adventure.sender(sender).sendMessage(

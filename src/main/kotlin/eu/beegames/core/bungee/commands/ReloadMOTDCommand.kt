@@ -10,7 +10,7 @@ import net.md_5.bungee.api.CommandSender
 import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.api.plugin.Command
 
-class ReloadMOTDCommand(private val plugin: CorePlugin) : Command("motd_reload", "eu.beegames.core.motd_reload") {
+class ReloadMOTDCommand(private val plugin: CorePlugin) : Command("motd_reload", Constants.Permissions.MOTDReload) {
     override fun execute(sender: CommandSender, args: Array<out String>) {
         plugin.reloadMOTDFiles()
         plugin.adventure.sender(sender).sendMessage(

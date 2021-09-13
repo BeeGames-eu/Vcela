@@ -14,4 +14,10 @@ class Constants {
 
         const val PluginMessagingChannel = "beegames_core:pmc"
     }
+
+    object Permissions {
+        const val BypassGeoIP = "eu.beegames.core.bypass_geoip"
+        const val SendAlert = "eu.beegames.core.send_alert"
+        const val MOTDReload = "eu.beegames.core.motd_reload"
+    }
 }

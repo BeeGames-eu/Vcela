@@ -5,3 +5,6 @@ db:
   name: s45_vcela
   username: TODO
   password: TODO123
+allowed_countries:
+  - CZ
+  - SK
