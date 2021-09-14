@@ -2,6 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import kotlin.streams.toList
 
 plugins {
     kotlin("jvm") version "1.5.10"
@@ -47,10 +48,10 @@ val makeShadow = tasks.register<ShadowJar>("makeShadow") {
     dependsOn("relocateShadows")
 
     doFirst {
-        relocators.removeIf {
-            // Relocating kotlin somehow breaks kotlin's reflection
-            (it is SimpleRelocator) && (it.pattern == "kotlin" || it.pattern.startsWith("kotlin."))
-        }
+        relocators = relocators.parallelStream().filter {
+            if (it !is SimpleRelocator) return@filter true
+            it.pattern != "kotlin" && !it.pattern.startsWith("kotlin.")
+        }.toList()
     }
 }
 

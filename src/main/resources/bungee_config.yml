@@ -5,6 +5,21 @@ db:
   name: s45_vcela
   username: TODO
   password: TODO123
-allowed_countries:
-  - CZ
-  - SK
+
+geoip:
+  allowed_countries:
+    - CZ
+    - SK
+  disconnect_blacklisted: |
+    &cYour location ({country}) is not whitelisted and therefore access to the server has been denied.
+    &cPlease contact info@beegames.eu for more information.
+    &c-------------
+    &cTvoje země ({country}) není na whitelistu, a tudíž ti byl odepřen přístup k serveru.
+    &cProsím, kontaktuj info@beegames.eu pro více informací.
+
+  disconnect_unknown: |
+    &cYour location is unknown and therefore access to the server has been denied.
+    &cPlease contact info@beegames.eu for more information.
+    &c-------------
+    &cTvoje země nebyla rozpoznána, a tudíž ti byl odepřen přístup k serveru.
+    &cProsím, kontaktuj info@beegames.eu pro více informací.

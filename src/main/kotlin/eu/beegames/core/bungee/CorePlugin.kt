@@ -53,6 +53,8 @@ class CorePlugin : Plugin(), Listener {
     private lateinit var precompiledMotdTextPre116: BaseComponent
 
     internal lateinit var whitelistedCountries: List<String>
+    internal lateinit var disconnectGeoipUnknownPrecompiled: Component
+    internal lateinit var disconnectGeoipBlacklistedPrecompiled: Component
 
     override fun onEnable() {
         _adv = BungeeAudiences.create(this)
@@ -77,7 +79,12 @@ class CorePlugin : Plugin(), Listener {
         val f = ensureFile(dataFolder, "config.yml", "bungee_config.yml")
         config = ConfigurationProvider.getProvider(YamlConfiguration::class.java).load(f)
 
-        whitelistedCountries = config.getStringList("allowed_countries")
+        whitelistedCountries = config.getStringList("geoip.allowed_countries")
+        disconnectGeoipBlacklistedPrecompiled = LegacyComponentSerializer.legacyAmpersand()
+            .deserialize(config.getString("geoip.disconnect_blacklisted") ?: "Blacklisted GeoIP location ({country})")
+        disconnectGeoipUnknownPrecompiled = LegacyComponentSerializer.legacyAmpersand()
+            .deserialize(config.getString("geoip.disconnect_unknown") ?: "Unknown GeoIP location")
+
 
         reloadMOTDFiles()
 
