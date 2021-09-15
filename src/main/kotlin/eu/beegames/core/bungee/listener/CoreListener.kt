@@ -57,7 +57,9 @@ class CoreListener(private val plugin: CorePlugin) : Listener {
                 }
 
                 val countryResp = lr.get()
-                if (!plugin.whitelistedCountries.contains(countryResp.country.isoCode)) {
+                if (!plugin.whitelistedCountries.contains(countryResp.country.isoCode) && !it.cachedData.permissionData
+                        .checkPermission("${Constants.Permissions.BypassGeoIP}.${countryResp.country.isoCode}")
+                        .asBoolean()) {
                     plugin.logger.warning("${ev.connection.name} has connected to the server with an address from ${countryResp.country.name}, denying access.")
                     ev.isCancelled = true
                     ev.setCancelReason(
