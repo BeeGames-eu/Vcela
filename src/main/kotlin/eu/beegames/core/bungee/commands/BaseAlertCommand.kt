@@ -9,8 +9,6 @@ import net.md_5.bungee.api.Title
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.api.plugin.Command
-import javax.xml.soap.Text
-import kotlin.reflect.jvm.internal.impl.descriptors.Named
 import net.kyori.adventure.title.Title as AdventureTitle
 
 abstract class BaseAlertCommand(protected val plugin: CorePlugin, cmdName: String, permission: String, vararg aliases: String) : Command(cmdName, permission, *aliases) {
