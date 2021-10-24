@@ -32,9 +32,9 @@ class CoreListener(private val plugin: CorePlugin) : Listener {
             .thenComposeAsync {
                 if (it == null) {
                     // return a future with null to avoid errors 
-                    val f = CompletableFuture<User?>()
-                    f.complete(null)
-                    f
+                    CompletableFuture<User?>().apply {
+                        complete(null)
+                    }
                 }
                 else lpApi.userManager.loadUser(it)
             }
@@ -42,6 +42,7 @@ class CoreListener(private val plugin: CorePlugin) : Listener {
                 if (it != null && it.cachedData.permissionData.checkPermission(Constants.Permissions.BypassGeoIP)
                         .asBoolean()
                 ) {
+                    plugin.logger.info("Letting ${ev.connection.name} in as they have a bypass permission")
                     return@thenAcceptAsync
                 }
 
@@ -92,8 +93,13 @@ class CoreListener(private val plugin: CorePlugin) : Listener {
                     )
                     return@thenAcceptAsync
                 }
+                
+                plugin.logger.info("Letting ${ev.connection.name} from ${countryResp.country.name} in (either via country-specific bypass permission or via country whitelist)")
             }
-            .thenAcceptAsync { ev.completeIntent(plugin) }
+            .thenAcceptAsync { 
+                
+                ev.completeIntent(plugin)
+            }
             .exceptionally {
                 ev.isCancelled = true
                 ev.setCancelReason(
