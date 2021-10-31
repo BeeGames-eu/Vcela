@@ -9,14 +9,13 @@ import net.kyori.adventure.text.TextReplacementConfig
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer
 import net.luckperms.api.LuckPermsProvider
-import net.luckperms.api.model.user.User
 import net.md_5.bungee.api.event.PreLoginEvent
 import net.md_5.bungee.api.plugin.Listener
 import net.md_5.bungee.event.EventHandler
 import net.md_5.bungee.protocol.ProtocolConstants
 import java.io.File
 import java.net.InetSocketAddress
-import java.util.concurrent.CompletableFuture
+import java.util.*
 
 class CoreListener(private val plugin: CorePlugin) : Listener {
     private val geoipDb = DatabaseReader.Builder(File(plugin.dataFolder, "GeoLite2-Country.mmdb"))
@@ -32,14 +31,15 @@ class CoreListener(private val plugin: CorePlugin) : Listener {
             .thenComposeAsync {
                 if (it == null) {
                     // return a future with null to avoid errors 
-                    CompletableFuture<User?>().apply {
+                    /*CompletableFuture<User?>().apply {
                         complete(null)
-                    }
+                    }*/
+                    lpApi.userManager.loadUser(UUID.nameUUIDFromBytes(("OfflinePlayer:${ev.connection.name}").toByteArray()))
                 }
                 else lpApi.userManager.loadUser(it)
             }
             .thenAcceptAsync {
-                if (it != null && it.cachedData.permissionData.checkPermission(Constants.Permissions.BypassGeoIP)
+                if (it.cachedData.permissionData.checkPermission(Constants.Permissions.BypassGeoIP)
                         .asBoolean()
                 ) {
                     plugin.logger.info("Letting ${ev.connection.name} in as they have a bypass permission")
@@ -70,10 +70,14 @@ class CoreListener(private val plugin: CorePlugin) : Listener {
                 }
 
                 val countryResp = lr.get()
-                if (!plugin.whitelistedCountries.contains(countryResp.country.isoCode) && (it != null && !it.cachedData.permissionData
-                        .checkPermission("${Constants.Permissions.BypassGeoIP}.${countryResp.country.isoCode}")
-                        .asBoolean())
-                ) {
+                if (!plugin.whitelistedCountries.contains(countryResp.country.isoCode)) {
+                    if (it.cachedData.permissionData
+                            .checkPermission("${Constants.Permissions.BypassGeoIP}.${countryResp.country.isoCode}")
+                            .asBoolean()) {
+                        plugin.logger.warning("Letting ${ev.connection.name} from ${countryResp.country.name} in via a country-specific bypass (${Constants.Permissions.BypassGeoIP}.${countryResp.country.isoCode})")
+                        return@thenAcceptAsync
+                    }
+
                     plugin.logger.warning("${ev.connection.name} has connected to the server with an address from ${countryResp.country.name}, denying access.")
                     ev.isCancelled = true
                     ev.setCancelReason(
@@ -94,10 +98,9 @@ class CoreListener(private val plugin: CorePlugin) : Listener {
                     return@thenAcceptAsync
                 }
                 
-                plugin.logger.info("Letting ${ev.connection.name} from ${countryResp.country.name} in (either via country-specific bypass permission or via country whitelist)")
+                plugin.logger.info("Letting ${ev.connection.name} from ${countryResp.country.name} in via country whitelist")
             }
-            .thenAcceptAsync { 
-                
+            .thenAcceptAsync {
                 ev.completeIntent(plugin)
             }
             .exceptionally {
