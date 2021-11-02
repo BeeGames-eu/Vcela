@@ -10,6 +10,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer
 import net.luckperms.api.LuckPermsProvider
 import net.md_5.bungee.api.event.PreLoginEvent
+import net.md_5.bungee.api.event.TabCompleteResponseEvent
 import net.md_5.bungee.api.plugin.Listener
 import net.md_5.bungee.event.EventHandler
 import net.md_5.bungee.protocol.ProtocolConstants
@@ -125,6 +126,13 @@ class CoreListener(private val plugin: CorePlugin) : Listener {
 
                 null // WTF: kotlin infers Void! for this function
             }
+    }
+
+    @EventHandler
+    fun on(ev: TabCompleteResponseEvent) {
+        ev.suggestions.removeIf {
+            it.contains(":") // it.startsWith("/") does not work with 1.13+
+        }
     }
 }
 
