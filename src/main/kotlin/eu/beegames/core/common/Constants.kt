@@ -19,5 +19,7 @@ class Constants {
         const val BypassGeoIP = "eu.beegames.core.bypass_geoip"
         const val SendAlert = "eu.beegames.core.send_alert"
         const val MOTDReload = "eu.beegames.core.motd_reload"
+        const val SendBugReport = "eu.beegames.core.send_bug_report"
+        const val SendReport = "eu.beegames.core.send_report"
     }
 }

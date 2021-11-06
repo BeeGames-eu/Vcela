@@ -23,8 +23,7 @@ abstract class BaseAlertCommand(protected val plugin: CorePlugin, cmdName: Strin
     companion object {
         val ALERT_TEXT = Component.text("Alert", NamedTextColor.RED)
 
-        val ADVENTURE_ALERT_PREFIX = Component.text("[")
-            .color(NamedTextColor.DARK_GRAY)
+        val ADVENTURE_ALERT_PREFIX = Component.text("[", NamedTextColor.DARK_GRAY)
             .append(ALERT_TEXT)
             .append(Component.text("]"))
             .append(Component.text(" ", NamedTextColor.WHITE))

@@ -38,6 +38,8 @@ dependencies {
     shadow("net.kyori:adventure-api:4.8.1")
     shadow("net.kyori:adventure-platform-bungeecord:4.0.0-SNAPSHOT")
     // shadow("net.kyori:adventure-platform-bukkit:4.0.0-SNAPSHOT")
+
+    shadow("club.minnced:discord-webhooks:0.7.2")
 }
 
 val makeShadow = tasks.register<ShadowJar>("makeShadow") {

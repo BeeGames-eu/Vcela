@@ -1,9 +1,8 @@
 package eu.beegames.core.bungee
 
-import eu.beegames.core.bungee.commands.GlobalAlertCommand
-import eu.beegames.core.bungee.commands.LocalAlertCommand
-import eu.beegames.core.bungee.commands.ReloadMOTDCommand
-import eu.beegames.core.bungee.commands.ServerSpecificAlertCommand
+import club.minnced.discord.webhook.WebhookClient
+import club.minnced.discord.webhook.WebhookClientBuilder
+import eu.beegames.core.bungee.commands.*
 import eu.beegames.core.bungee.listener.CoreListener
 import eu.beegames.core.common.Constants
 import eu.beegames.core.common.db.DatabaseGetter
@@ -25,6 +24,7 @@ import net.md_5.bungee.config.ConfigurationProvider
 import net.md_5.bungee.config.YamlConfiguration
 import net.md_5.bungee.event.EventHandler
 import net.md_5.bungee.protocol.ProtocolConstants
+import org.jetbrains.annotations.Nullable
 import org.ktorm.database.Database
 import org.ktorm.dsl.delete
 import org.ktorm.dsl.insert
@@ -33,6 +33,7 @@ import java.io.File
 import java.nio.file.Files
 import java.time.LocalDateTime
 import java.util.*
+import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 @Suppress("unused")
@@ -56,6 +57,9 @@ class CorePlugin : Plugin(), Listener {
     internal lateinit var disconnectGeoipUnknownPrecompiled: Component
     internal lateinit var disconnectGeoipBlacklistedPrecompiled: Component
 
+    internal lateinit var discordBugHookClient: WebhookClient
+    internal lateinit var discordReportHookClient: WebhookClient
+
     override fun onEnable() {
         _adv = BungeeAudiences.create(this)
 
@@ -64,6 +68,8 @@ class CorePlugin : Plugin(), Listener {
             ::LocalAlertCommand,
             ::ServerSpecificAlertCommand,
             ::ReloadMOTDCommand,
+            ::ReportBugCommand,
+            ::ReportCommand
         ).forEach {
             proxy.pluginManager.registerCommand(this, it(this))
         }
@@ -87,6 +93,12 @@ class CorePlugin : Plugin(), Listener {
 
 
         reloadMOTDFiles()
+
+        discordBugHookClient = WebhookClientBuilder(config.getString("reports.bug_webhook_url"))
+            .build()
+
+        discordReportHookClient = WebhookClientBuilder(config.getString("reports.webhook_url"))
+            .build()
 
         db = DatabaseGetter.getInstance(
             config.getInt("db.max_pool_size", 10),
