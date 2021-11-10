@@ -50,7 +50,7 @@ class ReportCommand(plugin: CorePlugin): BaseReportCommand(plugin, "report", Con
                         null))
                     .addField(WebhookEmbed.EmbedField(false, "Hráč", "`${reportPlayer.name}`"))
                     .addField(WebhookEmbed.EmbedField(false, "Server", "`${reportPlayer.server.info.name}`"))
-                    .addField(WebhookEmbed.EmbedField(false, "Popis", reason))
+                    .addField(WebhookEmbed.EmbedField(false, "Důvod", reason))
                     .setTimestamp(ZonedDateTime.now())
                     .setColor(0xFFFF00)
                     .build()
