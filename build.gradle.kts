@@ -1,11 +1,12 @@
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.api.tasks.compile.JavaCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import kotlin.streams.toList
 
 plugins {
-    kotlin("jvm") version "1.5.10"
+    kotlin("jvm") version("1.5.31")
     id("com.github.johnrengelman.shadow") version("5.2.0")
 }
 
@@ -31,13 +32,13 @@ dependencies {
 
     shadow(kotlin("stdlib-jdk8"))
     shadow(kotlin("reflect"))
-    shadow("com.zaxxer:HikariCP:4.0.3")
+    shadow("com.zaxxer:HikariCP:5.0.0")
     shadow("org.ktorm:ktorm-core:3.4.1")
     shadow("com.maxmind.geoip2:geoip2:2.15.0")
 
-    shadow("net.kyori:adventure-api:4.8.1")
-    shadow("net.kyori:adventure-platform-bungeecord:4.0.0-SNAPSHOT")
-    // shadow("net.kyori:adventure-platform-bukkit:4.0.0-SNAPSHOT")
+    shadow("net.kyori:adventure-api:4.9.3")
+    shadow("net.kyori:adventure-platform-bungeecord:4.0.0")
+    // shadow("net.kyori:adventure-platform-bukkit:4.0.0")
 
     shadow("club.minnced:discord-webhooks:0.7.2")
 }
@@ -58,7 +59,13 @@ val makeShadow = tasks.register<ShadowJar>("makeShadow") {
 }
 
 tasks {
-    withType<KotlinCompile> { kotlinOptions.jvmTarget = "1.8" }
+    "11".also {
+        withType<JavaCompile> {
+	    sourceCompatibility = it
+	    targetCompatibility = it
+	}
+        withType<KotlinCompile> { kotlinOptions.jvmTarget = it }
+    }
     named("build") {
         dependsOn("makeShadow")
     }
