@@ -58,8 +58,10 @@ class ReportBugCommand(plugin: CorePlugin): BaseReportCommand(plugin, "reportbug
                         .append(Component.text("Nové nahlášení bugu od hráče ", NamedTextColor.GOLD))
                         .append(Component.text(sender.name, NamedTextColor.YELLOW))
                         .append(Component.text(" - "))
-                        .append(Component.text("viz Discord", TextColor.color(0x7289da))
-                            .clickEvent(ClickEvent.openUrl(_getDiscordLinkUrl(it))))
+                        .append(
+                            Component.text("viz Discord", TextColor.color(0x7289da))
+                                .clickEvent(ClickEvent.openUrl(getDiscordMessageLinkURL(it)))
+                        )
                 )
 
             plugin.adventure.sender(sender)

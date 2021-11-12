@@ -6,7 +6,6 @@ import eu.beegames.core.bungee.CorePlugin
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.md_5.bungee.api.plugin.Command
-import net.md_5.bungee.api.plugin.Plugin
 import java.util.concurrent.CompletableFuture
 
 abstract class BaseReportCommand(protected val plugin: CorePlugin, cmdName: String, permission: String, vararg aliases: String) : Command(cmdName, permission, *aliases)  {
@@ -18,7 +17,7 @@ abstract class BaseReportCommand(protected val plugin: CorePlugin, cmdName: Stri
         }.send(embeds)
     }
 
-    protected fun _getDiscordLinkUrl(it: ReadonlyMessage): String {
+    protected fun getDiscordMessageLinkURL(it: ReadonlyMessage): String {
         return "https://discord.com/channels/824022859126931496/${it.channelId}/${it.id}"
     }
 
