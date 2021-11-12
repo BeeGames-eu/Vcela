@@ -34,8 +34,19 @@ class ReportCommand(plugin: CorePlugin): BaseReportCommand(plugin, "report", Con
         }
 
         val reportPlayer = plugin.proxy.getPlayer(args[0]) ?: return plugin.adventure.sender(sender)
-            .sendMessage(ADVENTURE_REPORTS_PREFIX
-                .append(Component.text("Tento hráč se nenachází na serveru!", NamedTextColor.RED)))
+            .sendMessage(
+                ADVENTURE_REPORTS_PREFIX
+                    .append(Component.text("Tento hráč se nenachází na serveru!", NamedTextColor.RED))
+            )
+
+        if (reportPlayer == sender) {
+            plugin.adventure.sender(sender)
+                .sendMessage(
+                    ADVENTURE_REPORTS_PREFIX
+                        .append(Component.text("Proč bys nahlašoval sám sebe? ;(", NamedTextColor.RED))
+                )
+            return
+        }
 
         val reason = args.drop(1).joinToString(" ").apply {
             substring(0..kotlin.math.min(256, length - 1))
@@ -45,7 +56,9 @@ class ReportCommand(plugin: CorePlugin): BaseReportCommand(plugin, "report", Con
             listOf(
                 WebhookEmbedBuilder()
                     .setTitle(WebhookEmbed.EmbedTitle("\uD83D\uDC65 Nahlášení hráče", null))
-                    .setAuthor(WebhookEmbed.EmbedAuthor("${sender.name} (ze serveru ${sender.server.info.name})",
+                    .setAuthor(
+                        WebhookEmbed.EmbedAuthor(
+                            "${sender.name} (ze serveru ${sender.server.info.name})",
                         "https://skin.beegames.eu/resources/server/skinRender.php?vr=0&hr=0&headOnly=true&ratio=20&user=${sender.name}",
                         null))
                     .addField(WebhookEmbed.EmbedField(false, "Hráč", "`${reportPlayer.name}`"))
