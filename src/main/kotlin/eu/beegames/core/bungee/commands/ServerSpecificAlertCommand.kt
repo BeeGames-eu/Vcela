@@ -18,13 +18,10 @@ class ServerSpecificAlertCommand(plugin: CorePlugin) : BaseAlertCommand(plugin, 
         }
 
         val serverName = args.first()
-        val server = plugin.proxy.servers[serverName] ?: run {
-            plugin.adventure.sender(sender).sendMessage(
-                Constants.ADVENTURE_PREFIX
-                    .append(Component.text("Server $serverName neexistuje!", NamedTextColor.RED))
-            )
-            return
-        }
+        val server = plugin.proxy.servers[serverName] ?: return plugin.adventure.sender(sender).sendMessage(
+            Constants.ADVENTURE_PREFIX
+                .append(Component.text("Server $serverName neexistuje!", NamedTextColor.RED))
+        )
 
         val alertComponent = LegacyComponentSerializer.legacyAmpersand()
             .deserialize(args.drop(1).joinToString(" "))
