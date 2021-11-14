@@ -2,8 +2,6 @@ package eu.beegames.core.common
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.TextComponent
 
 class Constants {
     companion object {
@@ -21,5 +19,6 @@ class Constants {
         const val MOTDReload = "eu.beegames.core.motd_reload"
         const val SendBugReport = "eu.beegames.core.send_bug_report"
         const val SendReport = "eu.beegames.core.send_report"
+        const val BaseAnnoyancePermission = "eu.beegames.core.annoyances"
     }
 }

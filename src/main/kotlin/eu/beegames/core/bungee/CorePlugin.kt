@@ -2,6 +2,7 @@ package eu.beegames.core.bungee
 
 import club.minnced.discord.webhook.WebhookClient
 import club.minnced.discord.webhook.WebhookClientBuilder
+import eu.beegames.core.bungee.annoyances.AnnoyanceManager
 import eu.beegames.core.bungee.commands.*
 import eu.beegames.core.bungee.listener.CoreListener
 import eu.beegames.core.common.Constants
@@ -11,6 +12,8 @@ import net.kyori.adventure.platform.bungeecord.BungeeAudiences
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+import net.luckperms.api.LuckPerms
+import net.luckperms.api.LuckPermsProvider
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.ServerPing
 import net.md_5.bungee.api.chat.BaseComponent
@@ -24,7 +27,6 @@ import net.md_5.bungee.config.ConfigurationProvider
 import net.md_5.bungee.config.YamlConfiguration
 import net.md_5.bungee.event.EventHandler
 import net.md_5.bungee.protocol.ProtocolConstants
-import org.jetbrains.annotations.Nullable
 import org.ktorm.database.Database
 import org.ktorm.dsl.delete
 import org.ktorm.dsl.insert
@@ -33,7 +35,6 @@ import java.io.File
 import java.nio.file.Files
 import java.time.LocalDateTime
 import java.util.*
-import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 @Suppress("unused")
@@ -41,7 +42,7 @@ class CorePlugin : Plugin(), Listener {
     private val quartersOfHour = arrayOf(0, 15, 30, 45)
 
     private lateinit var db: Database
-    private lateinit var config: Configuration
+    internal lateinit var config: Configuration
 
     private var _adv: BungeeAudiences? = null
     val adventure: BungeeAudiences
@@ -60,8 +61,14 @@ class CorePlugin : Plugin(), Listener {
     internal lateinit var discordBugHookClient: WebhookClient
     internal lateinit var discordReportHookClient: WebhookClient
 
+    internal lateinit var lpApi: LuckPerms
+
+
+    val annoyances = AnnoyanceManager(this)
+
     override fun onEnable() {
         _adv = BungeeAudiences.create(this)
+        lpApi = LuckPermsProvider.get()
 
         arrayOf(
             ::GlobalAlertCommand,
@@ -69,7 +76,8 @@ class CorePlugin : Plugin(), Listener {
             ::ServerSpecificAlertCommand,
             ::ReloadMOTDCommand,
             ::ReportBugCommand,
-            ::ReportCommand
+            ::ReportCommand,
+            ::AnnoyancesCommand
         ).forEach {
             proxy.pluginManager.registerCommand(this, it(this))
         }
@@ -126,6 +134,8 @@ class CorePlugin : Plugin(), Listener {
                 }
             }
         }, 0, 1, TimeUnit.SECONDS)
+
+        annoyances.enableDefaultAnnoyances()
 
         logger.info("Vcela was loaded.")
     }

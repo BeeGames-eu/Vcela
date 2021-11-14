@@ -8,7 +8,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextReplacementConfig
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer
-import net.luckperms.api.LuckPermsProvider
 import net.md_5.bungee.api.event.PreLoginEvent
 import net.md_5.bungee.api.event.TabCompleteResponseEvent
 import net.md_5.bungee.api.plugin.Listener
@@ -22,22 +21,18 @@ class CoreListener(private val plugin: CorePlugin) : Listener {
     private val geoipDb = DatabaseReader.Builder(File(plugin.dataFolder, "GeoLite2-Country.mmdb"))
         .withCache(CHMCache()).build()
 
-    private val lpApi = LuckPermsProvider.get()
-
-
     @EventHandler
     fun on(ev: PreLoginEvent) {
         ev.registerIntent(plugin)
-        lpApi.userManager.lookupUniqueId(ev.connection.name)
+        plugin.lpApi.userManager.lookupUniqueId(ev.connection.name)
             .thenComposeAsync {
                 if (it == null) {
                     // return a future with null to avoid errors 
                     /*CompletableFuture<User?>().apply {
                         complete(null)
                     }*/
-                    lpApi.userManager.loadUser(UUID.nameUUIDFromBytes(("OfflinePlayer:${ev.connection.name}").toByteArray()))
-                }
-                else lpApi.userManager.loadUser(it)
+                    plugin.lpApi.userManager.loadUser(UUID.nameUUIDFromBytes(("OfflinePlayer:${ev.connection.name}").toByteArray()))
+                } else plugin.lpApi.userManager.loadUser(it)
             }
             .thenAcceptAsync {
                 if (it.cachedData.permissionData.checkPermission(Constants.Permissions.BypassGeoIP)
