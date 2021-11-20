@@ -78,8 +78,5 @@ class AutoMessageAnnoyance(plugin: CorePlugin) : Annoyance(plugin) {
     override fun enableForPlayer(player: ProxiedPlayer) =
         plugin.lpApi.userManager.modifyUser(player.uniqueId) {
             it.data().remove(ReceiveNode)
-            /*it.data().clear { n -> (n.key == "${Constants.Permissions.BaseAnnoyancePermission}.${name}.receive").also { b ->
-                plugin.logger.info("${n.key} $b")
-            } }*/
         }
 }
