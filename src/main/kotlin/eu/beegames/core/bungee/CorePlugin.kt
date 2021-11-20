@@ -55,6 +55,7 @@ class CorePlugin : Plugin(), Listener {
     private lateinit var precompiledMotdTextPre116: BaseComponent
 
     internal lateinit var whitelistedCountries: List<String>
+    internal lateinit var whitelistedAddresses: List<String>
     internal lateinit var disconnectGeoipUnknownPrecompiled: Component
     internal lateinit var disconnectGeoipBlacklistedPrecompiled: Component
 
@@ -94,6 +95,8 @@ class CorePlugin : Plugin(), Listener {
         config = ConfigurationProvider.getProvider(YamlConfiguration::class.java).load(f)
 
         whitelistedCountries = config.getStringList("geoip.allowed_countries")
+        whitelistedAddresses = config.getStringList("geoip.allowed_ips")
+
         disconnectGeoipBlacklistedPrecompiled = LegacyComponentSerializer.legacyAmpersand()
             .deserialize(config.getString("geoip.disconnect_blacklisted") ?: "Blacklisted GeoIP location ({country})")
         disconnectGeoipUnknownPrecompiled = LegacyComponentSerializer.legacyAmpersand()

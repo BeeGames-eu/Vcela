@@ -48,6 +48,11 @@ class CoreListener(private val plugin: CorePlugin) : Listener {
                     return@thenAcceptAsync
                 }
 
+                if (plugin.whitelistedAddresses.contains(sa.address.hostAddress)) {
+                    plugin.logger.warning("Letting ${ev.connection.name} in (via IP whitelist: ${sa.address.hostAddress})")
+                    return@thenAcceptAsync
+                }
+
                 val lr = geoipDb.tryCountry(sa.address)
                 if (!lr.isPresent) {
                     plugin.logger.warning("${ev.connection.name} has connected to the server with an address from an unknown country, denying access.")
