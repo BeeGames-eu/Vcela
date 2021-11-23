@@ -1,7 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.gradle.api.tasks.compile.JavaCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import kotlin.streams.toList
 
@@ -11,7 +10,7 @@ plugins {
 }
 
 group = "eu.beegames"
-version = "1.3.3"
+version = "1.3.4"
 
 repositories {
     mavenCentral()
