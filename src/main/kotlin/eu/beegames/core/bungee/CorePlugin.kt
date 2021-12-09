@@ -77,6 +77,7 @@ class CorePlugin : Plugin(), Listener {
             ::ServerSpecificAlertCommand,
             ::ReloadMOTDCommand,
             ::ReportBugCommand,
+            ::ReportBugDeprecationNoticeCommand,
             ::ReportCommand,
             ::AnnoyancesCommand
         ).forEach {

@@ -12,7 +12,7 @@ import net.md_5.bungee.api.CommandSender
 import net.md_5.bungee.api.connection.ProxiedPlayer
 import java.time.ZonedDateTime
 
-class ReportBugCommand(plugin: CorePlugin): BaseReportCommand(plugin, "reportbug", Constants.Permissions.SendBugReport, "bugreport") {
+class ReportBugCommand(plugin: CorePlugin): BaseReportCommand(plugin, "bug", Constants.Permissions.SendBugReport, "bugreport") {
     override fun execute(sender: CommandSender, args: Array<out String>) {
         if (sender !is ProxiedPlayer) {
             plugin.adventure.sender(sender).sendMessage(
@@ -26,7 +26,7 @@ class ReportBugCommand(plugin: CorePlugin): BaseReportCommand(plugin, "reportbug
         if (args.isEmpty()) {
             plugin.adventure.sender(sender).sendMessage(
                 Constants.ADVENTURE_PREFIX
-                    .append(Component.text("Použití: /reportbug <...text>", NamedTextColor.RED))
+                    .append(Component.text("Použití: /bug <...text>", NamedTextColor.RED))
             )
 
             return
