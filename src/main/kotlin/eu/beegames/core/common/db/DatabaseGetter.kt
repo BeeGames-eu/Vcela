@@ -20,11 +20,7 @@ object DatabaseGetter {
                     .apply {
                         maximumPoolSize = maxPoolSize
 
-                        // Using the real mariadb datasource would be better, but the less deps, the better
-                        dataSourceClassName = "com.mysql.jdbc.jdbc2.optional.MysqlDataSource"
-                        addDataSourceProperty("serverName", server)
-                        addDataSourceProperty("port", port)
-                        addDataSourceProperty("databaseName", dbName)
+                        jdbcUrl = "jdbc:mysql://$server:$port/$dbName"
                         username = _username
                         password = _password
                     }
